@@ -1,0 +1,2 @@
+
+export { setupDirectives } from './directive';

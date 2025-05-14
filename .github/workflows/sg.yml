@@ -1,0 +1,123 @@
+name: SG(CICD) PROD
+
+on:
+  push:
+    tags:
+      - "v[0-9]+.[0-9]+.[0-9]+"
+env:
+  REGISTRY_NAMESPACE: knewta
+  SERVICE_NAME: curation-go-web
+  CONTAINER: curation-go-web
+  NAMESPACE: yi-prod
+  VERSION: ${{github.ref_name}}
+  K8S_CONTEXT: sg
+  TARGET_ENV: production
+  IMG_ALIYUN_REGISTRY: ${{vars.ALIYUN_REGISTRY_VPC}}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check env variable
+        run: echo "K8S_CONTEXT=${{env.K8S_CONTEXT}} VERSION=${{env.VERSION}} SERVICE_NAME=${{env.SERVICE_NAME}}"
+
+      - name: Notify to Lark
+        uses: foxundermoon/feishu-action@v2
+        with:
+          url: ${{ secrets.LARK_BOT_WEBHOOK_URL }}
+          msg_type: text
+          content: |
+            text: |
+              Kick of Build & Deploy 🏃🏃🏾🏃🏿🏃🏻🏃🏃🏾🏃🏿🏃🏻
+              Repository: ${{ github.repository }}
+              Service: ${{ env.SERVICE_NAME }}
+              Branch: ${{ github.ref }}
+              Committer: ${{ github.actor }}
+              Compare: ${{ github.event.compare }}
+
+      - name: Login to Aliyun Registry
+        run: echo ${{ secrets.ALIYUN_REGISTRY_PASSWORD }} | docker login --username ${{ secrets.ALIYUN_REGISTRY_USERNAME }} --password-stdin ${{vars.ALIYUN_REGISTRY}}
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - run: |
+          echo "TARGET_ENV=${{env.TARGET_ENV}}" 
+          npm i -g pnpm
+          rm -rf node_modules
+          pnpm install
+          NODE_ENV=production pnpm build:prod
+
+      - name: Build the Docker image
+        run: docker build . --no-cache --file Dockerfile --tag ${{vars.ALIYUN_REGISTRY}}/${{env.REGISTRY_NAMESPACE}}/${{ env.SERVICE_NAME }}:${{env.VERSION}}
+      - name: Push the Docker image
+        run: docker push ${{vars.ALIYUN_REGISTRY}}/${{env.REGISTRY_NAMESPACE}}/${{ env.SERVICE_NAME }}:${{env.VERSION}}
+      - name: Notify to Lark
+        if: failure()
+        uses: foxundermoon/feishu-action@v2
+        with:
+          url: ${{ secrets.LARK_BOT_WEBHOOK_URL }}
+          msg_type: text
+          content: |
+            text: |
+              Build Failed 👎👎🏻👎🏾👎🏿
+              Repository: ${{ github.repository }}
+              Service: ${{ env.SERVICE_NAME }}
+              Committer: ${{ github.actor }}
+              Compare: ${{ github.event.compare }}
+              Job status: ${{ job.status }}
+      - name: Notify to Lark
+        if: success()
+        uses: foxundermoon/feishu-action@v2
+        with:
+          url: ${{ secrets.LARK_BOT_WEBHOOK_URL }}
+          msg_type: text
+          content: |
+            text: |
+              Build Success 👍👍🏼👍🏾👍🏿
+              Repository: ${{ github.repository }}
+              Service: ${{ env.SERVICE_NAME }}
+              Committer: ${{ github.actor }}
+              Compare: ${{ github.event.compare }}
+              Job status: ${{ job.status }}
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Update the image in the k8s cluster
+        run: echo "Updating the image ${{env.IMG_ALIYUN_REGISTRY}}/${{env.REGISTRY_NAMESPACE}}/${{ env.SERVICE_NAME }}:${{env.VERSION}}"
+      - uses: actions-hub/kubectl@master
+        env:
+          KUBE_CONFIG: ${{ secrets.KUBE_CONFIG }}
+          KUBE_CONTEXT: ${{env.K8S_CONTEXT}}
+        with:
+          args: set image deployment/${{ env.CONTAINER }} ${{env.CONTAINER}}=${{env.IMG_ALIYUN_REGISTRY}}/${{env.REGISTRY_NAMESPACE}}/${{ env.SERVICE_NAME }}:${{env.VERSION}} -n ${{env.NAMESPACE}}
+
+      - name: Notify to Lark
+        if: failure()
+        uses: foxundermoon/feishu-action@v2
+        with:
+          url: ${{ secrets.LARK_BOT_WEBHOOK_URL }}
+          msg_type: text
+          content: |
+            text: |
+              Deploy Failed 👎👎🏻👎🏾👎🏿
+              Repository: ${{ github.repository }}
+              Service: ${{ env.SERVICE_NAME }}
+              Committer: ${{ github.actor }}
+              Compare: ${{ github.event.compare }}
+              Job status: ${{ job.status }}
+      - name: Notify to Lark
+        if: success()
+        uses: foxundermoon/feishu-action@v2
+        with:
+          url: ${{ secrets.LARK_BOT_WEBHOOK_URL }}
+          msg_type: text
+          content: |
+            text: |
+              Deploy Success 👍👍🏼👍🏾👍🏿
+              Repository: ${{ github.repository }}
+              Service: ${{ env.SERVICE_NAME }}
+              Committer: ${{ github.actor }}
+              Compare: ${{ github.event.compare }}
+              Job status: ${{ job.status }}
