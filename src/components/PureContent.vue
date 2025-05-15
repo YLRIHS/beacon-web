@@ -4,19 +4,8 @@
             <LoadingSpin />
         </template>
         <template v-else>
-            <div class="flex flex-1  flex-col items-center gap-4  overflow-hidden">
-                <!-- <div class="data_base_tool flex justify-between w-full">
-                    <div class="flex items-center gap-2">
-                        <a-button type="primary">
-                            <PureIcon icon="material-symbols:notifications-outline" class="inline text-lg" />
-                            Create Alert
-                        </a-button>
-                        <a-button type="primary" ghost>
-                            <PureIcon icon="mdi-light:note-text" class="inline text-lg" />
-                            Export Results
-                        </a-button>
-                    </div>
-                </div> -->
+            <div class="flex flex-1  flex-col items-center gap-2  overflow-hidden">
+                <PureCriteria />
                 <div
                     class="list_checkbox bg-white w-full flex items-center justify-between px-4 py-2 rounded-md border border-[#e5e5e5]">
 
@@ -100,7 +89,7 @@
 import { ref, getCurrentInstance, } from 'vue';//onMounted
 import { useBasicStore } from '@/stores/basic';
 import LoadingSpin from '@/components/common/LoadingSpin.vue';
-
+import PureCriteria from '@/components/PureCriteria.vue';
 
 // import { PURE_QUERIES } from "@/graphql/queries";
 // import { useQuery } from "@vue/apollo-composable";
