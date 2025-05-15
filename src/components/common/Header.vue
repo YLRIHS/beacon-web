@@ -1,14 +1,24 @@
 <script lang="ts" setup>
-import { ref } from "vue";
+import { onMounted, ref, watch } from "vue";
 import { useAppStore } from "@/stores/app";
+import { useBasicStore } from "@/stores/basic";
 
-const userStore = useAppStore();
+import { PROJECT_QUERIES } from "@/graphql/queries";
+import { useQuery } from "@vue/apollo-composable";
+
+const basicStore = useBasicStore();
+const appStore = useAppStore();
+const systemOpen = ref(false);
+
+
+const { result, refetch } = useQuery<any>(PROJECT_QUERIES.INDICATION_LIST)
+
 
 const goTemplate = (args: any) => {
     if (args.key === 'logout') {
-        userStore.setUserInfo({});
+        appStore.setUserInfo({});
         localStorage.removeItem("token");
-        const url = import.meta.env.VITE_AUTH_HOPEAI + "/#/?" + "product_code=" + userStore.systemCode;
+        const url = import.meta.env.VITE_AUTH_HOPEAI + "/#/?" + "product_code=" + appStore.systemCode;
         const re_url = import.meta.env.VITE_CURRENT_HOPEAI + "/#/";
         const redirect = url + "&redirect=" + encodeURIComponent(re_url);
         window.location.href = redirect;
@@ -18,13 +28,27 @@ const goTemplate = (args: any) => {
 };
 
 
-const systemOpen = ref(false);
 
 const afterOpenChange = (e: any) => {
     console.log(e)
 }
 
+const cutIndication = (li: any) => {
+    basicStore.setCurrentIndicationLabel(li);
+    systemOpen.value = false;
+}
+onMounted(() => {
+    refetch();
+})
 
+watch(() => result.value, (val) => {
+    if (val && val.IndicationList && val.IndicationList.length > 0) {
+        basicStore.setIndicationList(val.IndicationList);
+        if (Object.keys(basicStore.currentIndicationLabel).length === 0) {
+            basicStore.setCurrentIndicationLabel(val.IndicationList[0]);
+        }
+    }
+}, { immediate: true, deep: true })
 </script>
 
 <template>
@@ -34,25 +58,42 @@ const afterOpenChange = (e: any) => {
                 <img class="logos" alt="Image" src="@/assets/img/header_logo.svg" />
                 <span>PURE Evidence</span>
             </div>
-
-
-            <div class="user" v-if="userStore.username.length > 0" @click="systemOpen = true">
+            <div class="curation_menu flex-1 h-full flex items-center pl-2">
+                <p class="menu_name" v-if="basicStore.indicationList.length > 0">
+                    <a-dropdown :trigger="['click']">
+                        <span class="ant-dropdown-link flex  items-center" @click.prevent>
+                            {{ basicStore.currentIndicationLabel.name }}
+                            <PureIcon icon="material-symbols:arrow-drop-down-rounded" class="text-2xl" />
+                        </span>
+                        <template #overlay>
+                            <a-menu class="dropdown_menu">
+                                <a-menu-item :class="[li.id === basicStore.currentIndicationLabel.id ? 'active' : '']"
+                                    v-for="(li, index) of basicStore.indicationList" @click.prevent="cutIndication(li)"
+                                    :key="index">
+                                    {{ li.name }} </a-menu-item>
+                            </a-menu>
+                        </template>
+                    </a-dropdown>
+                </p>
+                <p class="menu_name" v-else>
+                    No Indication
+                </p>
+            </div>
+            <div class="user" v-if="appStore.username.length > 0" @click="systemOpen = true">
                 <a-avatar size="large" :style="{ verticalAlign: 'middle' }">
-                    {{ userStore.username[0].toUpperCase() }}
+                    {{ appStore.username[0].toUpperCase() }}
                 </a-avatar>
             </div>
         </div>
-
-
         <a-drawer v-model:open="systemOpen" class="Overlay_class" :closable="false" root-class-name="root-class-name"
             placement="right" @after-open-change="afterOpenChange" :width="320">
             <div class="Overlay">
                 <div class="Overlay_header">
                     <div class="Overlay_titleWrap">
                         <a-avatar size="middle" :style="{ verticalAlign: 'middle' }">
-                            {{ userStore.username[0].toUpperCase() }}
+                            {{ appStore.username[0].toUpperCase() }}
                         </a-avatar>
-                        <span class="name">{{ userStore.username }}</span>
+                        <span class="name">{{ appStore.username }}</span>
                     </div>
                     <div class="Overlay_close">
                         <PureIcon icon="material-symbols:close-rounded" class="text-xl" @click="systemOpen = false" />
@@ -60,7 +101,7 @@ const afterOpenChange = (e: any) => {
                 </div>
                 <div class="Overlay_body">
                     <ul class="Overlay_ul">
-                        <li v-for="manage of userStore.sysMenuList">
+                        <li v-for="manage of appStore.sysMenuList">
                             <template v-if="manage.key !== 'divider'">
                                 <p class="template_manger" @click="goTemplate(manage)">
                                     <PureIcon :icon="manage.icon" class="text-base" />

@@ -80,12 +80,10 @@
 
 </template>
 <script lang="ts" setup>
-import { ref, watch, getCurrentInstance, onMounted } from 'vue';
+import { ref, getCurrentInstance, onMounted } from 'vue';
 import { useBasicStore } from '@/stores/basic';
 import LoadingSpin from '@/components/common/LoadingSpin.vue';
 
-
-import { customStudyTableAPI } from "@/api";
 import { clinicalTrialsGovAPI } from '@/api';
 
 
@@ -96,7 +94,6 @@ const basicStore = useBasicStore();
 const emit = defineEmits(['updateSelect']);
 const studyIDList = ref<any>([]);
 
-const customStudy = ref<any>([]);
 import { StarOutlined, LikeOutlined, MessageOutlined } from '@ant-design/icons-vue';
 const listData: Record<string, string>[] = [];
 
@@ -124,18 +121,7 @@ const actions: Record<string, any>[] = [
     { icon: MessageOutlined, text: '2' },
 ];
 
-const getCustomTableList = () => {
-    customStudyTableAPI.getCustomTableList(basicStore.currentIndicationLabel.id).then((res: any) => {
-        if (res && res.data && res.data.length > 0) {
-            customStudy.value = res.data
-        } else {
-            customStudy.value = []
-        }
-    }).catch(() => {
-        customStudy.value = []
-    }).finally(() => {
-    })
-}
+
 const activeKey = ref(0);
 const options = ref([
     { value: "1", label: "Clinical Trial" },
@@ -241,11 +227,7 @@ onMounted(() => {
 
 
 
-watch(() => basicStore.currentIndicationLabel, (newVal: any) => {
-    if (newVal.id) {
-        getCustomTableList()
-    }
-}, { deep: true, immediate: true })
+
 
 </script>
 

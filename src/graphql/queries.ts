@@ -2,9 +2,9 @@
 import gql from 'graphql-tag'
 
 export const PROJECT_QUERIES = {
-    GET_PROJECT_LIST: gql`
+    PROJECT_LIST: gql`
         query ProjectList {
-            projectList {
+            ProjectList {
                 id
                 name
                 indication_id
@@ -13,9 +13,9 @@ export const PROJECT_QUERIES = {
             }
         }
     `, 
-    GET_PROJECT: gql`
+    PROJECT: gql`
         query Project($id: String!) {
-            project(id: $id) {
+            Project(id: $id) {
                 id
                 name
                 indication_id
@@ -24,9 +24,9 @@ export const PROJECT_QUERIES = {
             }
         } 
     `, 
-    GET_PROJECT_LIST_BY_INDICATION: gql`
+    PROJECT_LIST_BY_INDICATION: gql`
         query ProjectListByIndication($indication_id: String!) {
-            projectListByIndication(indication_id: $indication_id) {
+            ProjectListByIndication(indication_id: $indication_id) {
                 id
                 name
                 indication_id
@@ -35,9 +35,9 @@ export const PROJECT_QUERIES = {
             }
         }
     `,
-    GET_INDICATION_LIST: gql`
+    INDICATION_LIST: gql`
         query IndicationList {
-            indicationList {
+            IndicationList {
                 id
                 name
                 keywords
@@ -45,5 +45,55 @@ export const PROJECT_QUERIES = {
             }
         }
     `,
-    
+    CUSTOM_TABLE: gql`
+        query CustomTable($id: String!) {
+            CustomTable(id: $id) {
+                id
+                created_at
+                updated_at
+                study_ids
+                row_data
+                status
+                running_process
+                enum_map
+            }
+        }
+    `,
+    CUSTOM_TABLE_LIST: gql`
+        query CustomTableList {
+            CustomTableList {
+                id
+                created_at
+                updated_at
+                study_ids
+                row_data
+                status
+                running_process
+                enum_map
+            }
+        }
+    `, 
+    PROMPT_LIB_LIST: gql`
+        query PromptLibList {
+            PromptLibList {
+                label
+                value
+            }
+        }
+    `,
+   
+    PROMPT_LIB_BY_ID: gql`
+        query GetPromptLibById($id: String!) {
+            GetPromptLibById(id: $id) {
+                id
+                systemPrompt
+                instructionPrompt
+                instructionModelName
+                instructionModelConfig {
+                    temperature
+                    topP
+                }
+            }
+        }
+    ` 
 }
