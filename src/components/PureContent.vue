@@ -1,6 +1,6 @@
 <template>
     <div class="flex-1 h-full overflow-hidden flex flex-col gap-4">
-        <template v-if="isInitLoading">
+        <template v-if="basicStore.tableLoading">
             <LoadingSpin />
         </template>
         <template v-else>
@@ -16,43 +16,19 @@
                             Export Results
                         </a-button>
                     </div>
-                    <div class="flex items-center gap-2">
-                        <span class="text-sm">A total of 9 results sort by</span>
-                        <div class="bg-white flex items-center px-2 py-1 rounded-md border border-[#e5e5e5]">
-                            <a-dropdown :trigger="['click']">
-                                <span
-                                    class="ant-dropdown-link flex  cursor-pointer whitespace-nowrap items-center gap-1 "
-                                    @click.prevent>
-                                    Clinical Trial
-                                    <PureIcon icon="solar:alt-arrow-down-line-duotone" class="text-base" />
-                                </span>
-                                <template #overlay>
-                                    <a-menu class="dropdown_menu">
-                                        <a-menu-item :class="[index === activeKey ? 'active' : '']"
-                                            v-for="(li, index) of options" :key="index">
-                                            {{ li.label }} </a-menu-item>
-                                    </a-menu>
-                                </template>
-                            </a-dropdown>
-                        </div>
-                    </div>
                 </div>
                 <div
                     class="list_checkbox bg-white w-full flex items-center justify-between px-4 py-2 rounded-md border border-[#e5e5e5]">
-                    <a-checkbox class="!border-0 !bg-transparent !text-[#000] !p-0 !m-0" @change="select_all_to_costom">
+                    <a-checkbox class="!border-0 !bg-transparent !text-[#000] !p-0 !m-0">
+                        <!-- @change="select_all_to_costom" -->
                         Select All
                     </a-checkbox>
                 </div>
                 <div class="flex flex-1 overflow-auto">
-                    <a-list item-layout="vertical" size="large" :pagination="pagination" :data-source="listData">
-                        <!-- <template #footer>
-                            <div>
-                                <b>ant design vue</b>
-                                footer part
-                            </div>
-                        </template> -->
+                    <a-list item-layout="vertical" :pagination="pagination" :data-source="listData">
+
                         <template #renderItem="{ item }">
-                            <a-list-item key="item.title" class="bg-white !mb-4">
+                            <a-list-item key="item.title" class="bg-white !mb-3 border !border-[#e5e5e5] rounded-md">
                                 <template #actions>
                                     <span v-for="{ icon, text } in actions" :key="icon">
                                         <component :is="icon" style="margin-right: 8px" />
@@ -80,19 +56,20 @@
 
 </template>
 <script lang="ts" setup>
-import { ref, getCurrentInstance, onMounted } from 'vue';
+import { ref, getCurrentInstance, watch, reactive } from 'vue';//onMounted
 import { useBasicStore } from '@/stores/basic';
 import LoadingSpin from '@/components/common/LoadingSpin.vue';
 
 import { clinicalTrialsGovAPI } from '@/api';
 
+// import { PURE_QUERIES } from "@/graphql/queries";
+// import { useQuery } from "@vue/apollo-composable";
 
 const instance = getCurrentInstance();
 let { proxy }: any = instance;
 const isInitLoading = ref(true);
 const basicStore = useBasicStore();
 const emit = defineEmits(['updateSelect']);
-const studyIDList = ref<any>([]);
 
 import { StarOutlined, LikeOutlined, MessageOutlined } from '@ant-design/icons-vue';
 const listData: Record<string, string>[] = [];
@@ -122,48 +99,7 @@ const actions: Record<string, any>[] = [
 ];
 
 
-const activeKey = ref(0);
-const options = ref([
-    { value: "1", label: "Clinical Trial" },
-    { value: "2", label: "选项2" },
-    { value: "3", label: "选项3" },
-])
 
-
-
-const createNewStatus = ref(false);
-
-const createNewInfo = ref<any>({
-    name: '',
-    study_id_list: studyIDList.value,
-});
-
-
-
-const select_all_to_costom = () => {
-    proxy.$loadingBar.start();
-    let sendData: any = {
-        keyword: basicStore.keyword,
-        indication: basicStore.currentIndicationLabel.id
-    }
-    if (basicStore.filters && Object.keys(basicStore.filters).length > 0) {
-        sendData['filters'] = basicStore.filters
-    }
-    if (basicStore.dateFilters && Object.keys(basicStore.dateFilters).length > 0) {
-        sendData = { ...sendData, ...basicStore.dateFilters }
-    }
-    clinicalTrialsGovAPI.searchIDs(sendData).then((res: any) => {
-        if (res && res.data && res.data.ids) {
-            createNewInfo.value.study_id_list = res.data.ids
-            createNewStatus.value = true;
-        }
-    }).catch(() => {
-
-    }).finally(() => {
-        proxy.$loadingBar.finish();
-    })
-
-}
 
 
 
@@ -175,7 +111,7 @@ const getSearchData = () => {
         keyword: basicStore.keyword,
         page_idx: Math.max(0, basicStore.pageIdx - 1),
         page_size: basicStore.pageSize,
-        indication: 'MM'
+        indication: basicStore.currentIndicationLabel.id,
     }
     if (basicStore.filters && Object.keys(basicStore.filters).length > 0) {
         sendData['filters'] = basicStore.filters
@@ -217,16 +153,17 @@ const getSearchData = () => {
 }
 
 
-onMounted(() => {
-    basicStore.setFilters({})
-    basicStore.clearFilterSubmit()
-    basicStore.clearKeyword()
-    basicStore.resetPage()
-    getSearchData()
-})
+// watch(() => basicStore.currentIndicationLabel.id, (newVal) => {
+//     if (newVal) {
+//         basicStore.setFilters({})
+//         basicStore.clearFilterSubmit()
+//         basicStore.clearKeyword()
+//         basicStore.resetPage()
+//         getSearchData()
 
 
-
+//     }
+// }, { immediate: true })
 
 
 </script>

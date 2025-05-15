@@ -1,7 +1,7 @@
 // 集中管理所有的 GraphQL 查询语句
 import gql from 'graphql-tag'
 
-export const PROJECT_QUERIES = {
+export const PURE_QUERIES = {
     PROJECT_LIST: gql`
         query ProjectList {
             ProjectList {
@@ -80,8 +80,7 @@ export const PROJECT_QUERIES = {
                 value
             }
         }
-    `,
-   
+    `, 
     PROMPT_LIB_BY_ID: gql`
         query GetPromptLibById($id: String!) {
             GetPromptLibById(id: $id) {
@@ -95,5 +94,278 @@ export const PROJECT_QUERIES = {
                 }
             }
         }
-    ` 
+    `,
+    SEARCH_CT_GOV: gql`
+        query SearchCtgov($kwargs: SearchRequestEsParams!) {
+            SearchCtgov(kwargs: $kwargs) {
+                headers
+                data
+                total
+                aggs {
+            study_status {
+                doc_count_error_upper_bound
+                sum_other_doc_count
+                buckets {
+                    key
+                    key_as_string
+                    doc_count
+                }
+                meta {
+                    field
+                    values
+                }
+            }
+            eligibility_criteria_sex_all {
+                doc_count
+                meta {
+                    field
+                    values
+                }
+            }
+            eligibility_criteria_sex_male {
+                doc_count
+                meta {
+                    field
+                    values
+                }
+            }
+            eligibility_criteria_sex_female {
+                doc_count
+                meta {
+                    field
+                    values
+                }
+            }
+            eligibility_criteria_sex_other {
+                doc_count
+                meta {
+                    field
+                    values
+                }
+            }
+            eligibility_criteria_ages {
+                doc_count_error_upper_bound
+                sum_other_doc_count
+                buckets {
+                    key
+                    key_as_string
+                    doc_count
+                }
+                meta {
+                    field
+                    values
+                }
+            }
+            eligibility_criteria_volunteers {
+                doc_count_error_upper_bound
+                sum_other_doc_count
+                buckets {
+                    key
+                    key_as_string
+                    doc_count
+                }
+                meta {
+                    field
+                    values
+                }
+            }
+            study_phase {
+                doc_count_error_upper_bound
+                sum_other_doc_count
+                buckets {
+                    key
+                    key_as_string
+                    doc_count
+                }
+                meta {
+                    field
+                    values
+                }
+            }
+            study_type {
+                doc_count_error_upper_bound
+                sum_other_doc_count
+                buckets {
+                    key
+                    key_as_string
+                    doc_count
+                }
+                meta {
+                    field
+                    values
+                }
+            }
+            study_type_observational_registry {
+                doc_count_error_upper_bound
+                sum_other_doc_count
+                buckets {
+                    key
+                    key_as_string
+                    doc_count
+                }
+                meta {
+                    field
+                    values
+                }
+            }
+            study_type_expanded_access_individual {
+                doc_count_error_upper_bound
+                sum_other_doc_count
+                buckets {
+                    key
+                    key_as_string
+                    doc_count
+                }
+                meta {
+                    field
+                    values
+                }
+            }
+            study_type_expanded_access_inter {
+                doc_count_error_upper_bound
+                sum_other_doc_count
+                buckets {
+                    key
+                    key_as_string
+                    doc_count
+                }
+                meta {
+                    field
+                    values
+                }
+            }
+            study_type_expanded_access_treatment {
+                doc_count_error_upper_bound
+                sum_other_doc_count
+                buckets {
+                    key
+                    key_as_string
+                    doc_count
+                }
+                meta {
+                    field
+                    values
+                }
+            }
+            with_results {
+                doc_count_error_upper_bound
+                sum_other_doc_count
+                buckets {
+                    key
+                    key_as_string
+                    doc_count
+                }
+                meta {
+                    field
+                    values
+                }
+            }
+            document_section_has_protocol {
+                doc_count_error_upper_bound
+                sum_other_doc_count
+                buckets {
+                    key
+                    key_as_string
+                    doc_count
+                }
+                meta {
+                    field
+                    values
+                }
+            }
+            funder_type_other_fed {
+                doc_count
+                meta {
+                    field
+                    values
+                }
+            }
+            funder_type_other_gov {
+                doc_count
+                meta {
+                    field
+                    values
+                }
+            }
+            funder_type_network {
+                doc_count
+                meta {
+                    field
+                    values
+                }
+            }
+            funder_type_unknown {
+                doc_count
+                meta {
+                    field
+                    values
+                }
+            }
+            funder_type_other {
+                doc_count
+                meta {
+                    field
+                    values
+                }
+            }
+            funder_type_industry {
+                doc_count
+                meta {
+                    field
+                    values
+                }
+            }
+            funder_type_nih {
+                doc_count
+                meta {
+                    field
+                    values
+                }
+            }
+            funder_type {
+                doc_count_error_upper_bound
+                sum_other_doc_count
+                buckets {
+                    key
+                    key_as_string
+                    doc_count
+                }
+                meta {
+                    field
+                    values
+                }
+            }
+            document_section_has_icf {
+                doc_count_error_upper_bound
+                sum_other_doc_count
+                buckets {
+                    key
+                    key_as_string
+                    doc_count
+                }
+                meta {
+                    field
+                    values
+                }
+            }
+            document_section_has_sap {
+                doc_count_error_upper_bound
+                sum_other_doc_count
+                buckets {
+                    key
+                    key_as_string
+                    doc_count
+                }
+                meta {
+                    field
+                    values
+                }
+            }
+        }
+            }
+        }
+    `
 }
+    
+    
+

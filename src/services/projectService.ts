@@ -1,18 +1,18 @@
-import { useQuery } from '@vue/apollo-composable'
+import { useQuery ,useResult} from '@vue/apollo-composable'
 
-import {PROJECT_QUERIES} from "@/graphql/queries"
+import {PURE_QUERIES} from "@/graphql/queries"
 
 import type{
     ProjectResponse,
     ProjectListResponse
 } from "@/graphql/types"
-import { computed, ref } from 'vue'
+import { computed  } from 'vue'
 
 export const useProjectService = () => {
     // 获取project列表
     const getProjectList = ()=>{
        
-        const { result, loading, error ,refetch} = useQuery<ProjectListResponse>(PROJECT_QUERIES.PROJECT_LIST)
+        const { result, loading, error ,refetch} = useQuery<ProjectListResponse>(PURE_QUERIES.PROJECT_LIST)
         const projectList = computed(() => result.value?.projectList || [])
         return {
             projectList,
@@ -21,9 +21,8 @@ export const useProjectService = () => {
             refetch
         }
     }
-    const getProjectById = (id: string) => {
-        console.log('id', id)
-        const { result, loading, error,refetch } = useQuery<ProjectResponse>(PROJECT_QUERIES.PROJECT, () => ({ id }))
+    const getProjectById = (id: string) => { 
+        const { result, loading, error,refetch } = useQuery<ProjectResponse>(PURE_QUERIES.PROJECT, () => ({ id }))
         const project = computed(() => result.value?.project || null)
         return {
             project,
@@ -33,19 +32,35 @@ export const useProjectService = () => {
         }
     } 
     const getIndicationList = () => {
-        const { result, loading, error, refetch } = useQuery<any>(PROJECT_QUERIES.INDICATION_LIST)
-        const indicationList = computed(() => result.value?.indicationList || [])
+        const { result, loading, error, refetch } = useQuery<any>(PURE_QUERIES.INDICATION_LIST)
+        const IndicationList = computed(() => result.value?.IndicationList || [])
         return {
-            indicationList,
+            IndicationList,
             loading,
             error,
             refetch
+        }
+    }
+    // SEARCH_CT_GOV
+
+    const getSearchCtGov = (kwargs:any) => {
+        const { result, loading, error, refetch,onResult, onError } = useQuery<any>(PURE_QUERIES.SEARCH_CT_GOV,kwargs)
+        // console.log("kwargs",kwargs)
+        const SearchCtgov = computed(() => result.value?.SearchCtgov || [])
+        return {
+            SearchCtgov,
+            loading,
+            error,
+            refetch,
+            onResult,
+            onError
         }
     }
 
     return {
         getProjectList,
         getProjectById,
-        getIndicationList
+        getIndicationList,
+        getSearchCtGov
     }
 }

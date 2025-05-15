@@ -10,6 +10,24 @@ export const useAppStore = defineStore('app', {
     userInfo: <any>{},   
     sysMenuList: [   
       {
+          icon: '',
+          title: '',
+          key: 'divider',
+          role: '*',
+          app:'common',
+          routerMain:false,
+          roles:['admin','user','viewer'],
+      },  
+      {
+          icon: 'ic:outline-settings',
+          title: 'Settings',
+          key: 'header_setting',
+          role: '*',
+          app:'common',
+          routerMain:false,
+          roles:['admin','user','viewer'],
+      },  
+      {
           icon: 'ion:md-log-out',
           title: 'Log out',
           key: 'logout',
@@ -18,9 +36,13 @@ export const useAppStore = defineStore('app', {
           routerMain:false,
           roles:['admin','user','viewer'],
       },
-  ],  
+    ],  
+    collapsed: false,
   }),
   actions: { 
+    changeMenuStatus() { 
+      this.collapsed = !this.collapsed;
+    },
     setUserInfo(user: any) {
         this.userInfo = user;
     },

@@ -37,7 +37,25 @@ const _currentRoutes: Array<RouteRecordRaw> = [
         roles:['admin','user','viewer'],
         permission:'*',
       }
-    }
+    },
+    {
+      path:'/set',
+      name:'share', 
+      component:()=>import("@/views/Setting.vue"),
+      meta:{
+        requiresAuth:true,
+        roles:['admin','user'],
+        permission:'*',
+      },  
+      children:[ 
+        {
+          // column_setting
+          path:'/set/prompt_setting',
+          name:'prompt_setting',
+          component:()=> import("@/views/settings/PromptSetting.vue"),
+        }
+      ]
+    },
       
 ];
  

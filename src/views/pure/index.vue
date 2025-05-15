@@ -1,47 +1,106 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, reactive, getCurrentInstance, watch } from 'vue';
 import PureDataFilter from "@/components/PureDataFilter.vue";
 import PureContent from "@/components/PureContent.vue";
-import { onUnmounted, getCurrentInstance } from "vue";
-import { useBasicStore } from "@/stores/basic";
+import { useProjectService } from '@/services';
+import { useBasicStore } from '@/stores/basic';
 
 const basicStore = useBasicStore();
+const iseSearchEnabled = ref(false);
+const projectService = useProjectService();
+
 const instance = getCurrentInstance();
 let { proxy }: any = instance;
-
-const activeKey = ref(0);
-const options = ref([
-    { value: "1", label: "Clinical Trial" },
-    { value: "2", label: "选项2" },
-    { value: "3", label: "选项3" },
-])
-const cutIndication = (li: any) => {
-    console.log(li);
-}
-onUnmounted(() => {
-    proxy.$loadingBar.finish();
-    basicStore.clear()
+const searchParams = ref<any>({
+    keywords: '',
+    indication: 'MM',
+    page_idx: 0,
+    page_size: 10,
 })
+
+const { SearchCtgov, refetch: SearchReftch, onError } = projectService.getSearchCtGov({
+    kwargs: searchParams,
+    enable: iseSearchEnabled.value
+});
+
+
+
+onError((err: any) => {
+    console.log('onError', err)
+    basicStore.setTableLoading(false);
+    basicStore.setPureLists([])
+    basicStore.setTotal(0)
+    iseSearchEnabled.value = false;
+    proxy.$loadingBar.error();
+})
+const getSearchCTGov = async () => {
+    basicStore.setTableLoading(true)
+    proxy.$loadingBar.start();
+    searchParams.value.keywords = basicStore.keyword
+    searchParams.value.indication = basicStore.currentIndicationLabel.id
+    searchParams.value.page_idx = Math.max(0, basicStore.pageIdx - 1)
+    searchParams.value.page_size = basicStore.pageSize;
+    if (basicStore.filters && Object.keys(basicStore.filters).length > 0) {
+        searchParams.value['filters'] = basicStore.filters
+    } else {
+        searchParams.value['filters'] = {}
+    }
+    if (basicStore.dateFilters && Object.keys(basicStore.dateFilters).length > 0) {
+        searchParams.value = { ...searchParams.value, ...basicStore.dateFilters }
+    }
+    iseSearchEnabled.value = true;
+    await SearchReftch()
+    basicStore.setTableLoading(false);
+    iseSearchEnabled.value = false;
+    proxy.$loadingBar.finish();
+}
+
+// const handleUpdateSelect = async () => {
+//     basicStore.setTableLoading(true)
+//     proxy.$loadingBar.start();
+//     searchParams.value.keywords = basicStore.keyword
+//     searchParams.value.indication = basicStore.currentIndicationLabel.id
+//     searchParams.value.page_idx = Math.max(0, basicStore.pageIdx - 1)
+//     searchParams.value.page_size = basicStore.pageSize;
+
+//     await SearchReftch()
+//     basicStore.setTableLoading(false);
+//     iseSearchEnabled.value = false;
+//     proxy.$loadingBar.finish();
+
+// }
+
+watch(() => basicStore.currentIndicationLabel.id, (newVal) => {
+    if (newVal) {
+        basicStore.setFilters({})
+        basicStore.clearFilterSubmit()
+        basicStore.clearKeyword()
+        basicStore.resetPage()
+
+        getSearchCTGov()
+
+    }
+}, { immediate: true })
+
+watch(() => SearchCtgov.value, (newVal) => {
+    if (newVal) {
+        if (newVal && newVal.data && newVal.data.length > 0) {
+            basicStore.setPureLists(newVal.data)
+            basicStore.setTotal(newVal.totals)
+            basicStore.setTableFilterData(newVal.aggs)
+        } else {
+            basicStore.setPureLists([])
+        }
+    }
+}, { immediate: true })
+
 
 </script>
 
 <template>
     <div class="all_tables flex-1 overflow-hidden   flex justify-between flex-col gap-4 px-5 py-4 ">
         <div class="search_box   flex justify-between bg-white p-1 rounded-md border border-[#e5e5e5]">
-            <a-dropdown :trigger="['click']" class="border-r border-[#e5e5e5] pr-1 pl-1">
-                <span class="ant-dropdown-link flex  cursor-pointer whitespace-nowrap items-center !font-bold"
-                    @click.prevent>
-                    Clinical Trial
-                    <PureIcon icon="material-symbols:arrow-drop-down-rounded" class="text-2xl" />
-                </span>
-                <template #overlay>
-                    <a-menu class="dropdown_menu">
-                        <a-menu-item :class="[index === activeKey ? 'active' : '']" v-for="(li, index) of options"
-                            @click.prevent="cutIndication(li)" :key="index">
-                            {{ li.label }} </a-menu-item>
-                    </a-menu>
-                </template>
-            </a-dropdown>
+
             <a-input class="!border-0 focus:!border-0 focus:!shadow-none" placeholder='Clinical Trial' />
             <a-button type="primary" size="large" class="font-bold">
                 <PureIcon icon="material-symbols:search-rounded" class="inline text-lg" />
@@ -49,7 +108,7 @@ onUnmounted(() => {
             </a-button>
         </div>
         <div class="flex-1 overflow-hidden   flex justify-between gap-4">
-            <PureDataFilter />
+            <PureDataFilter @updateSelect="getSearchCTGov" />
             <PureContent />
         </div>
     </div>

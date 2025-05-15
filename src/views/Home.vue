@@ -88,7 +88,7 @@
                                         class=" text-base inline-block  text-red-700" />
                                 </p>
                                 <a-select v-model:value="createProjectInfo.indication_id" style="width: 100%"
-                                    :options="indicationList.map((item: any) => { return { value: item.id, label: item.name } })"></a-select>
+                                    :options="IndicationList.map((item: any) => { return { value: item.id, label: item.name } })"></a-select>
                             </div>
 
 
@@ -234,7 +234,7 @@ const confirmNewProject = async () => {
 };
 
 const { projectList, loading, refetch: projectRefetch } = projectService.getProjectList();
-const { indicationList } = projectService.getIndicationList();
+const { IndicationList } = projectService.getIndicationList();
 
 const delInfo = ref<any>({});
 
@@ -258,7 +258,7 @@ const openCreate = () => {
 }
 
 const getIndicationName = (id: string) => {
-    const indication = indicationList.value.find((item: any) => item.id === id);
+    const indication = IndicationList.value.find((item: any) => item.id === id);
     return indication ? indication.name : '';
 }
 

@@ -16,6 +16,7 @@ const radioStyle = reactive({
     lineHeight: '30px',
 });
 
+const emit = defineEmits(['updateSelect']);
 
 const searchKwargs = reactive<any>({
     study_start_date_from: Dayjs,
@@ -174,7 +175,8 @@ const apply_filter = () => {
     }
     basicStore.setFilters(newSend);
     basicStore.resetPage();
-    getSearchData()
+    emit('updateSelect');
+    // getSearchData()
 }
 
 
@@ -214,7 +216,8 @@ const reset_filter = () => {
         searchKwargs[key] = '';
     }
     basicStore.setDateFilters({});
-    getSearchData()
+    emit('updateSelect');
+    // getSearchData()
 }
 
 const getSearchData = () => {

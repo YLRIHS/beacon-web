@@ -3,15 +3,19 @@ import { onMounted, ref, watch } from "vue";
 import { useAppStore } from "@/stores/app";
 import { useBasicStore } from "@/stores/basic";
 
-import { PROJECT_QUERIES } from "@/graphql/queries";
+import { PURE_QUERIES } from "@/graphql/queries";
 import { useQuery } from "@vue/apollo-composable";
+
+import { useRouter } from "vue-router";
+
+const router = useRouter();
 
 const basicStore = useBasicStore();
 const appStore = useAppStore();
 const systemOpen = ref(false);
 
 
-const { result, refetch } = useQuery<any>(PROJECT_QUERIES.INDICATION_LIST)
+const { result, refetch } = useQuery<any>(PURE_QUERIES.INDICATION_LIST)
 
 
 const goTemplate = (args: any) => {
@@ -22,6 +26,8 @@ const goTemplate = (args: any) => {
         const re_url = import.meta.env.VITE_CURRENT_HOPEAI + "/#/";
         const redirect = url + "&redirect=" + encodeURIComponent(re_url);
         window.location.href = redirect;
+    } else if (args.key === 'header_setting') {
+        router.push(`/set/prompt_setting`);
     }
 
     systemOpen.value = false;
@@ -67,7 +73,8 @@ watch(() => result.value, (val) => {
                         </span>
                         <template #overlay>
                             <a-menu class="dropdown_menu">
-                                <a-menu-item :class="[li.id === basicStore.currentIndicationLabel.id ? 'active' : '']"
+                                <a-menu-item
+                                    :class="['cursor-pointer', li.id === basicStore.currentIndicationLabel.id ? 'active' : '']"
                                     v-for="(li, index) of basicStore.indicationList" @click.prevent="cutIndication(li)"
                                     :key="index">
                                     {{ li.name }} </a-menu-item>

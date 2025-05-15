@@ -217,7 +217,8 @@ export const useBasicStore = defineStore("basic", {
         filterStr: <any>[],
         dataTableHeader: <any>[],
         startTimer:false,
-        dateFilters: <any> {}
+        dateFilters: <any> {},
+        pureLists: <any> [],
     }),
     actions: { 
         // filterData
@@ -296,10 +297,7 @@ export const useBasicStore = defineStore("basic", {
                 headers: this.dataTableHeader,
             };
         },
-        setTableHeader(tableHeader: any) { 
-            this.tableInfo.headers = tableHeader;
-            localStorage.setItem('DataTableHeader', JSON.stringify(tableHeader));
-        },
+        
         // filters
         setFilters(filters: any) {
             this.filters = filters;
@@ -393,6 +391,10 @@ export const useBasicStore = defineStore("basic", {
         // dateFilters
         setDateFilters(dateFilters:any){
             this.dateFilters = dateFilters;
+        },
+        // pureLists
+        setPureLists(pureLists:any){
+            this.pureLists = pureLists;
         },
     }
 })
