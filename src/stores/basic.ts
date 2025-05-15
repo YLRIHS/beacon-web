@@ -394,7 +394,10 @@ export const useBasicStore = defineStore("basic", {
         },
         // pureLists
         setPureLists(pureLists:any){
-            this.pureLists = pureLists;
+            this.pureLists = pureLists.map((item: any) => ({
+                ...item,
+                checked: false
+            }));
         },
     }
 })

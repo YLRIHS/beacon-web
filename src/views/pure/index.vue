@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, reactive, getCurrentInstance, watch } from 'vue';
+import { ref, getCurrentInstance, watch } from 'vue';
 import PureDataFilter from "@/components/PureDataFilter.vue";
 import PureContent from "@/components/PureContent.vue";
 import { useProjectService } from '@/services';
