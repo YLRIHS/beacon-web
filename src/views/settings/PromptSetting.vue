@@ -17,9 +17,11 @@
 
 
                 </div>
+                {{ activeFuncInfo }}
+                {{ currentFuncInfo }}
                 <template v-if="Object.keys(currentFuncInfo).length > 0">
                     <div class="flex-1 h-full bg-theme-body bg-white p-5 rounded-lg flex flex-col gap-5">
-                        <template v-if="functionInfoLoading">
+                        <template v-if="activePromptLibsLoading">
                             <LoadingSpin />
                         </template>
                         <template v-else>
@@ -89,10 +91,14 @@
 </template>
 
 <script setup lang="ts">
-import { globalAPI, promptLibsAPI } from "@/api";
+import { promptLibsAPI } from "@/api";
 import LoadingSpin from "@/components/common/LoadingSpin.vue";
 import { useBasicStore } from "@/stores/basic";
-import { watch, ref, getCurrentInstance, onMounted } from "vue";
+import { watch, ref, getCurrentInstance, onMounted, computed } from "vue";
+
+import { PURE_QUERIES } from "@/graphql/queries";
+import { useQuery } from "@vue/apollo-composable";
+
 const instance = getCurrentInstance();
 let { proxy }: any = instance;
 const basicStore = useBasicStore();
@@ -109,14 +115,14 @@ const currentFuncInfo = ref<any>({
     }
 });
 const activeFuncInfo = ref<any>({});
-const functionInfoLoading = ref(false);
+
 const isChange = ref(false);
 const funcTools = ref<any[]>([]);
 
 const filterModelOption = ref<any[]>([]);
 
 
-
+const { result: promptListResult, refetch } = useQuery<any>(PURE_QUERIES.GET_PROMPT_LIB_LIST)
 
 
 const cuts = (info: any) => {
@@ -125,6 +131,7 @@ const cuts = (info: any) => {
         return;
     }
     activeFuncInfo.value = info;
+    activeKey.value = info.value;
 
 }
 
@@ -156,15 +163,58 @@ const save = async () => {
 
 const cancelFun = () => {
     isChange.value = false;
-    fetchPromptLibsByIdFun(activeFuncInfo.value.value);
+
 
 }
 
-const getModelOption = async () => {
-    proxy.$loadingBar.start();
-    const res: any = await globalAPI.fetchLLMModelNames();
-    if (res && res.length > 0) {
-        filterModelOption.value = res.map((item: any) => {
+const { result: ModelResult, refetch: ModelRefetch } = useQuery<any>(PURE_QUERIES.GET_LLM_MODEL_LIST)
+
+const isEnabled = ref(false);
+const activeKey = ref('');
+const { result: activePromptLibsResult, loading: activePromptLibsLoading, refetch: activePromptLibsRefetch, onError } = useQuery(
+    PURE_QUERIES.GET_PROMPT_LIB_BY_ID,
+    () => ({
+        id: activeKey.value
+    }),
+    // 关键参数：仅当 userId 有值时才执行查询
+    { enabled: isEnabled }
+);
+
+
+
+
+watch(() => activeKey.value, (newVal) => {
+    if (newVal) {
+        isEnabled.value = true;
+        activePromptLibsRefetch()
+        isEnabled.value = false;
+    }
+}, { immediate: true, deep: true });
+
+watch(() => promptListResult.value, (val) => {
+
+    isLoading.value = true;
+    if (val && val.GetPromptLibList && val.GetPromptLibList.length > 0) {
+        funcTools.value = val.GetPromptLibList.map((item: any) => {
+            return {
+                label: item.label,
+                value: item.value
+            }
+        });
+        activeFuncInfo.value = funcTools.value[0];
+        activeKey.value = funcTools.value[0].value;
+
+
+    } else {
+        funcTools.value = [];
+    }
+    isLoading.value = false;
+}, { immediate: true, deep: true })
+
+watch(() => ModelResult.value, (val) => {
+
+    if (val && val.GetLlmModelList && val.GetLlmModelList.length > 0) {
+        filterModelOption.value = val.GetLlmModelList.map((item: any) => {
             return {
                 label: item.value,
                 value: item.key
@@ -173,78 +223,43 @@ const getModelOption = async () => {
     } else {
         filterModelOption.value = [];
     }
-    proxy.$loadingBar.finish();
-}
+}, { immediate: true, deep: true })
 
-// fetchPromptLibsList
 
-const fetchPromptLibsListFun = async () => {
-    proxy.$loadingBar.start();
-    isLoading.value = true;
-    const res: any = await promptLibsAPI.fetchPromptLibsList();
-    if (res && res.data && res.data.length > 0) {
-        funcTools.value = res.data;
-        activeFuncInfo.value = res.data[0];
-    } else {
-        funcTools.value = [];
-    }
-    isLoading.value = false;
-    proxy.$loadingBar.finish();
-}
+// watch(() => activePromptLibsResult.value, (val) => {
+
+//     if (val && val.GetPromptLibById) {
+//         currentFuncInfo.value = val.GetPromptLibById;
+//     } else {
+//         currentFuncInfo.value = {
+//             id: activePromptLibsResult.value.id,
+//             systemPrompt: '',
+//             instructionPrompt: '',
+//             instructionModelName: '',
+//             instructionModelConfig: {
+//                 temperature: 0,
+//                 topP: 0
+//             }
+//         };
+//     }
+
+
+// }, { immediate: true, deep: true })
 
 onMounted(() => {
-
-    getModelOption();
+    ModelRefetch()
 })
-// fetchPromptLibsById
-const fetchPromptLibsByIdFun = async (id: string) => {
-    proxy.$loadingBar.start();
-    try {
-        const res: any = await promptLibsAPI.fetchPromptLibsById(id);
-        if (res && res.data) {
-            currentFuncInfo.value = res.data;
-        } else {
-            currentFuncInfo.value = {
-                id: id,
-                system_prompt: '',
-                instruction_prompt: '',
-                instruction_model_name: '',
-                instruction_model_config: {
-                    temperature: 0,
-                    top_p: 0
-                }
-            };
-        }
-    } catch (error) {
-        currentFuncInfo.value = {
-            id: id,
-            system_prompt: '',
-            instruction_prompt: '',
-            instruction_model_name: '',
-            instruction_model_config: {
-                temperature: 0,
-                top_p: 0
-            }
-        };
-    }
 
-    functionInfoLoading.value = false;
-    proxy.$loadingBar.finish();
-}
+
 
 watch(() => basicStore.currentIndicationLabel, (newVal) => {
     if (newVal.id) {
-        fetchPromptLibsListFun();
+        refetch()
 
     }
 }, { immediate: true, deep: true });
 
-watch(() => activeFuncInfo.value, (newVal) => {
-    if (newVal && newVal.value) {
-        functionInfoLoading.value = true;
-        fetchPromptLibsByIdFun(newVal.value);
-    }
-}, { immediate: true, deep: true });
+
 </script>
 
 <style lang="scss" scoped>

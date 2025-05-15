@@ -364,7 +364,42 @@ export const PURE_QUERIES = {
         }
             }
         }
-    `
+    `,
+    GET_PROMPT_LIB_LIST: gql`
+        query GetPromptLibList {
+            GetPromptLibList {
+                label
+                value
+            }
+        }
+    `, 
+    GET_LLM_MODEL_LIST: gql`
+        query GetLlmModelList {
+            GetLlmModelList {
+                key
+                value
+            }
+        }
+    `, 
+   
+     GET_PROMPT_LIB_BY_ID: gql`
+        query GetPromptLibById($id: String!) {
+            GetPromptLibById(id: $id) {
+                id
+                systemPrompt
+                instructionPrompt
+                instructionModelName
+                instructionModelConfig {
+                    temperature
+                    topP
+                }
+            }
+}
+                `
+    
+    
+
+    
 }
     
     

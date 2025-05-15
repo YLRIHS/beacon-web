@@ -41,9 +41,13 @@ const getSearchCTGov = async () => {
     searchParams.value.page_idx = Math.max(0, basicStore.pageIdx - 1)
     searchParams.value.page_size = basicStore.pageSize;
     if (basicStore.filters && Object.keys(basicStore.filters).length > 0) {
-        searchParams.value['filters'] = basicStore.filters
+        const filters = JSON.parse(JSON.stringify(basicStore.filters));
+        searchParams.value['filters'] = Object.entries(filters).flatMap(([key, values]: any) =>
+            values.map((value: any) => ({ key: key, values: value }))
+        );
+
     } else {
-        searchParams.value['filters'] = {}
+        searchParams.value['filters'] = []
     }
     if (basicStore.dateFilters && Object.keys(basicStore.dateFilters).length > 0) {
         searchParams.value = { ...searchParams.value, ...basicStore.dateFilters }
@@ -55,20 +59,7 @@ const getSearchCTGov = async () => {
     proxy.$loadingBar.finish();
 }
 
-// const handleUpdateSelect = async () => {
-//     basicStore.setTableLoading(true)
-//     proxy.$loadingBar.start();
-//     searchParams.value.keywords = basicStore.keyword
-//     searchParams.value.indication = basicStore.currentIndicationLabel.id
-//     searchParams.value.page_idx = Math.max(0, basicStore.pageIdx - 1)
-//     searchParams.value.page_size = basicStore.pageSize;
 
-//     await SearchReftch()
-//     basicStore.setTableLoading(false);
-//     iseSearchEnabled.value = false;
-//     proxy.$loadingBar.finish();
-
-// }
 
 watch(() => basicStore.currentIndicationLabel.id, (newVal) => {
     if (newVal) {
