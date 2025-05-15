@@ -8,20 +8,30 @@ import {current_user } from"@/api/user"
 // import { socket } from "@/api/socketio";
 // 常驻路由
 const _currentRoutes: Array<RouteRecordRaw> = [
+    // {
+    //   path: "/",
+    //   name: "ViewHome",
+    //   component: () => import("@/views/Home.vue"), 
+    //   meta:{
+    //     requiresAuth:true,
+    //     roles:['admin','user','viewer'],
+    //     permission:'*',
+    //   }
+    // }, 
     {
-      path: "/",
-      name: "ViewHome",
-      component: () => import("@/views/Home.vue"), 
+      path:'/pure/:id',
+      name:'ViewPure',
+      component: () => import('@/views/pure/[id].vue'),
       meta:{
         requiresAuth:true,
         roles:['admin','user','viewer'],
         permission:'*',
       }
-    }, 
+    },
     {
-      path:'/pure/:id',
-      name:'ViewPure',
-      component: () => import('@/views/pure/[id].vue'),
+      path:'/',
+      name:'ViewPureHome',
+      component: () => import('@/views/pure/index.vue'),
       meta:{
         requiresAuth:true,
         roles:['admin','user','viewer'],

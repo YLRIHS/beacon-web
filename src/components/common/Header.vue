@@ -29,8 +29,8 @@ const afterOpenChange = (e: any) => {
 
 <template>
     <div class="header_content bg-white">
-        <div class="header">
-            <div class="logo flex items-center gap-2">
+        <div class="header px-5">
+            <div class="logo flex items-center gap-2 cursor-pointer" @click="$router.push('/')">
                 <img class="logos" alt="Image" src="@/assets/img/header_logo.svg" />
                 <span>PURE Evidence</span>
             </div>
@@ -147,7 +147,7 @@ const afterOpenChange = (e: any) => {
     align-items: center;
     height: 56px;
     justify-content: space-between;
-    padding: 0px 20px;
+
     position: relative;
     width: 100%;
 }
