@@ -41,6 +41,7 @@ const afterOpenChange = (e: any) => {
 
 const cutIndication = (li: any) => {
     basicStore.setCurrentIndicationLabel(li);
+    localStorage.setItem("currentIndicationLabel", JSON.stringify(li));
     systemOpen.value = false;
 }
 onMounted(() => {
@@ -50,9 +51,21 @@ onMounted(() => {
 watch(() => result.value, (val) => {
     if (val && val.IndicationList && val.IndicationList.length > 0) {
         basicStore.setIndicationList(val.IndicationList);
-        if (Object.keys(basicStore.currentIndicationLabel).length === 0) {
+        const currentIndicationLabel = localStorage.getItem("currentIndicationLabel");
+        if (currentIndicationLabel) {
+            const parsedLabel = JSON.parse(currentIndicationLabel);
+            const foundLabel = val.IndicationList.find((item: any) => item.id === parsedLabel.id);
+            if (foundLabel) {
+                basicStore.setCurrentIndicationLabel(foundLabel);
+            } else {
+                basicStore.setCurrentIndicationLabel(val.IndicationList[0]);
+            }
+        } else {
             basicStore.setCurrentIndicationLabel(val.IndicationList[0]);
         }
+        // if (Object.keys(basicStore.currentIndicationLabel).length === 0) {
+        //     basicStore.setCurrentIndicationLabel(val.IndicationList[0]);
+        // }
     }
 }, { immediate: true, deep: true })
 </script>
