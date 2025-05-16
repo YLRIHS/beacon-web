@@ -1,92 +1,102 @@
 <template>
     <div class="flex-1 h-full overflow-hidden flex flex-col gap-4">
+
         <template v-if="basicStore.tableLoading">
             <LoadingSpin />
         </template>
         <template v-else>
-            <div class="flex flex-1  flex-col items-center gap-2  overflow-hidden">
-                <PureCriteria />
-                <div
-                    class="list_checkbox bg-white w-full flex items-center justify-between px-4 py-2 rounded-md border border-[#e5e5e5]">
+            <template v-if="basicStore.pureLists.length > 0">
+                <div class="flex flex-1  flex-col items-center gap-2  overflow-hidden">
+                    <PureCriteria />
+                    <div
+                        class="list_checkbox bg-white w-full flex items-center justify-between px-4 py-2 rounded-md border border-[#e5e5e5]">
 
-                    <a-checkbox v-model:checked="isAllChecked" @change="selectAll"> Select All</a-checkbox>
-                </div>
-                <div class="flex flex-1 overflow-auto">
-                    <a-list item-layout="vertical" :pagination="pagination" :data-source="basicStore.pureLists">
-                        <template #renderItem="{ item }">
-                            <a-list-item key="item.title" class="bg-white !mb-3 border !border-[#e5e5e5] rounded-md">
-                                <div class="flex gap-2 ">
-                                    <div class=" items-baseline">
-                                        <a-checkbox v-model:checked="item.checked"></a-checkbox>
-                                    </div>
-                                    <div class="flex flex-col flex-1 gap-2">
-                                        <p>
-                                            <span class="text-base text-purple-800 !font-semibold">{{ item.study_title
-                                            }}</span>
-                                            <span class="text-gray-600 pl-1">({{ item.nct_number }})</span>
-                                        </p>
-                                        <div class="grid grid-cols-3 gap-4">
-                                            <div class="flex flex-col gap-2">
-                                                <p class="flex flex-col gap-1">
-                                                    <span class="text-gray-500">Start Date</span>
-                                                    <span>{{ item.study_start.date ? item.study_start.date : ''
-                                                    }}</span>
-                                                </p>
+                        <a-checkbox v-model:checked="isAllChecked" @change="selectAll"> Select All</a-checkbox>
+                    </div>
+                    <div class="flex flex-1 overflow-auto">
+                        <a-list item-layout="vertical" :pagination="pagination" :data-source="basicStore.pureLists">
+                            <template #renderItem="{ item }">
+                                <a-list-item key="item.title"
+                                    class="bg-white !mb-3 border !border-[#e5e5e5] rounded-md">
+                                    <div class="flex gap-2 ">
+                                        <div class=" items-baseline">
+                                            <a-checkbox v-model:checked="item.checked"></a-checkbox>
+                                        </div>
+                                        <div class="flex flex-col flex-1 gap-2">
+                                            <p>
+                                                <span class="text-base text-purple-800 !font-semibold">{{
+                                                    item.study_title
+                                                }}</span>
+                                                <span class="text-gray-600 pl-1">({{ item.nct_number }})</span>
+                                            </p>
+                                            <div class="grid grid-cols-3 gap-4">
+                                                <div class="flex flex-col gap-2">
+                                                    <p class="flex flex-col gap-1">
+                                                        <span class="text-gray-500">Start Date</span>
+                                                        <span>{{ item.study_start.date ? item.study_start.date : ''
+                                                        }}</span>
+                                                    </p>
 
-                                                <p class="flex flex-col gap-1">
-                                                    <span class="text-gray-500">Enrollment Count</span>
-                                                    <span>{{ item.enrollment }}</span>
-                                                </p>
+                                                    <p class="flex flex-col gap-1">
+                                                        <span class="text-gray-500">Enrollment Count</span>
+                                                        <span>{{ item.enrollment }}</span>
+                                                    </p>
 
-                                            </div>
-                                            <div class="flex flex-col gap-2">
-                                                <p class="flex flex-col gap-1">
-                                                    <span class="text-gray-500">Last Post Date</span>
-                                                    <span>{{ item.last_update_posted }}</span>
-                                                </p>
+                                                </div>
+                                                <div class="flex flex-col gap-2">
+                                                    <p class="flex flex-col gap-1">
+                                                        <span class="text-gray-500">Last Post Date</span>
+                                                        <span>{{ item.last_update_posted }}</span>
+                                                    </p>
 
-                                                <p class="flex flex-col gap-1">
-                                                    <span class="text-gray-500">Sponsor</span>
-                                                    <span>{{ item.sponsor }}</span>
-                                                </p>
+                                                    <p class="flex flex-col gap-1">
+                                                        <span class="text-gray-500">Sponsor</span>
+                                                        <span>{{ item.sponsor }}</span>
+                                                    </p>
 
-                                            </div>
-                                            <div class="flex flex-col gap-2">
-                                                <p class="flex flex-col gap-1">
-                                                    <span class="text-gray-500">Overall Status</span>
-                                                    <span>
-                                                        {{ item.status ? item.status.charAt(0).toUpperCase() +
-                                                            item.status.slice(1) : '' }}</span>
-                                                </p>
+                                                </div>
+                                                <div class="flex flex-col gap-2">
+                                                    <p class="flex flex-col gap-1">
+                                                        <span class="text-gray-500">Overall Status</span>
+                                                        <span>
+                                                            {{ item.status ? item.status.charAt(0).toUpperCase() +
+                                                                item.status.slice(1) : '' }}</span>
+                                                    </p>
 
-                                                <p class="flex flex-col gap-1">
-                                                    <span class="text-gray-500">Study Type</span>
-                                                    <span>{{ item.study_type ? item.study_type.charAt(0).toUpperCase() +
-                                                        item.study_type.slice(1) : '' }}</span>
-                                                </p>
+                                                    <p class="flex flex-col gap-1">
+                                                        <span class="text-gray-500">Study Type</span>
+                                                        <span>{{ item.study_type ?
+                                                            item.study_type.charAt(0).toUpperCase() +
+                                                            item.study_type.slice(1) : '' }}</span>
+                                                    </p>
 
-                                                <p class="flex flex-col gap-1">
-                                                    <span class="text-gray-500">Phase</span>
-                                                    <span>{{ item.phase.length > 0 ? item.phase : '-' }}</span>
-                                                </p>
+                                                    <p class="flex flex-col gap-1">
+                                                        <span class="text-gray-500">Phase</span>
+                                                        <span>{{ item.phase.length > 0 ? item.phase : '-' }}</span>
+                                                    </p>
 
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
 
-                                <!-- {{ item }} -->
-                            </a-list-item>
-                        </template>
-                    </a-list>
+                                    <!-- {{ item }} -->
+                                </a-list-item>
+                            </template>
+                        </a-list>
+                    </div>
                 </div>
-            </div>
+            </template>
+            <template v-else>
+                <a-empty description=""></a-empty>
+            </template>
+
         </template>
     </div>
 
 </template>
 <script lang="ts" setup>
-import { ref, getCurrentInstance, } from 'vue';//onMounted
+import { ref, getCurrentInstance, watch, } from 'vue';//onMounted
 import { useBasicStore } from '@/stores/basic';
 import LoadingSpin from '@/components/common/LoadingSpin.vue';
 import PureCriteria from '@/components/PureCriteria.vue';
@@ -98,7 +108,7 @@ const instance = getCurrentInstance();
 let { proxy }: any = instance;
 const isInitLoading = ref(true);
 const basicStore = useBasicStore();
-const emit = defineEmits(['updateSelect']);
+const emit = defineEmits(['updateSelect', 'changePage']);
 const isAllChecked = ref(false);
 
 const listData: Record<string, string>[] = [];
@@ -117,6 +127,8 @@ for (let i = 0; i < 23; i++) {
 const pagination = {
     onChange: (page: number) => {
         console.log(page);
+        basicStore.setPageIdx(page);
+        emit('changePage');
     },
     pageSize: basicStore.pageSize,
     total: basicStore.total,
@@ -129,6 +141,14 @@ const selectAll = () => {
     });
 };
 
+watch(() => basicStore.total, (newVal: any) => {
+    if (newVal > 0) {
+        pagination.total = newVal;
+    }
+}, {
+    immediate: true,
+    deep: true
+});
 </script>
 
 <style lang="scss">

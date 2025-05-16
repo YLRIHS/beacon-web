@@ -220,45 +220,7 @@ const reset_filter = () => {
     // getSearchData()
 }
 
-const getSearchData = () => {
-    basicStore.setTableLoading(true);
-    proxy.$loadingBar.start();
 
-    getFilterStr()
-    const sendData = {
-        keyword: basicStore.keyword,
-        page_idx: Math.max(0, basicStore.pageIdx - 1),
-        page_size: basicStore.pageSize,
-        indication: basicStore.currentIndicationLabel.id,
-        filters: basicStore.filters,
-        ...basicStore.dateFilters,
-    }
-    clinicalTrialsGovAPI.searchDatabase(sendData).then((res: any) => {
-        if (res && res.data) {
-            // Add a unique key to each row of data
-            const dataWithKeys = res.data.data && res.data.data.length > 0
-                ? res.data.data.map((item: any, index: number) => ({
-                    ...item,
-                    key: item.nct_number || `row-${index}-${Date.now()}` // Use NCT number as key or generate one
-                }))
-                : [];
-            basicStore.setTableInfo({
-                data: dataWithKeys,
-                headers: res.data.headers
-            })
-            basicStore.setTotal(res.data.totals)
-            basicStore.setTableFilterData(res.data.aggs)
-        }
-        proxy.$loadingBar.finish();
-        basicStore.setTableLoading(false);
-    }).catch(() => {
-        proxy.$loadingBar.error();
-        basicStore.setTableLoading(false);
-    }).finally(() => {
-        basicStore.setIsApplyFilter(false);
-
-    })
-}
 
 
 const getFilterStr = () => {
@@ -339,10 +301,10 @@ watch(() => searchKwargs, (newVal: any) => {
         v-if="basicStore.tableFilterData && Object.keys(basicStore.tableFilterData).length > 0">
         <template v-if="showFilter">
             <div
-                class="filter_header h-[60px] flex justify-between items-center px-4 bg-gray-100 border-b border-gray-300 ">
+                class="filter_header h-[60px] flex justify-between items-center px-4 bg-white border-b border-gray-300 ">
                 <div class="flex-1 flex flex-col   items-start justify-center">
-                    <span class="fonts_bold">Focus Your Search</span>
-                    <span class="text-sm text-gray-500">(all filters optional)</span>
+                    <span class="fonts_bold">FILTER</span>
+
                 </div>
                 <div class="filter_tool" @click="showFilter = !showFilter">
                     <PureIcon icon="material-symbols:double-arrow-rounded" class="text-2xl rotate-180 cursor-pointer" />
@@ -350,11 +312,11 @@ watch(() => searchKwargs, (newVal: any) => {
             </div>
             <div class="filter_content flex-1 overflow-auto ">
                 <template v-if="basicStore.tableFilterData && Object.keys(basicStore.tableFilterData).length > 0">
-                    <div class="base_line border-b border-gray-300   p-4 flex flex-col gap-3">
+                    <!-- <div class="base_line border-b border-gray-300   p-4 flex flex-col gap-3">
                         <div class="w-full flex flex-col gap-1">
                             <a-input v-model:value="basicStore.keyword" placeholder="search" @change="handleSearch" />
                         </div>
-                    </div>
+                    </div> -->
                     <div class="study_status border-b border-gray-300   flex flex-col gap-3  p-4">
                         <p class="sea_title   text-lg">Study Status</p>
                         <a-checkbox-group class="w-full flex flex-col gap-4 overflow-hidden"

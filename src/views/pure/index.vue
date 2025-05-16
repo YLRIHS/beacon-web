@@ -77,7 +77,7 @@ watch(() => SearchCtgov.value, (newVal) => {
     if (newVal) {
         if (newVal && newVal.data && newVal.data.length > 0) {
             basicStore.setPureLists(newVal.data)
-            basicStore.setTotal(newVal.totals)
+            basicStore.setTotal(newVal.total)
             basicStore.setTableFilterData(newVal.aggs)
         } else {
             basicStore.setPureLists([])
@@ -100,7 +100,7 @@ watch(() => SearchCtgov.value, (newVal) => {
         </div>
         <div class="flex-1 overflow-hidden   flex justify-between gap-4">
             <PureDataFilter @updateSelect="getSearchCTGov" />
-            <PureContent />
+            <PureContent @changePage="getSearchCTGov" />
         </div>
     </div>
 </template>
