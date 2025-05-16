@@ -50,7 +50,6 @@
                             </template>
                         </p>
                     </div>
-                    {{ basicStore.pageIdx }}
                     <div class="flex-1 overflow-auto w-full">
                         <a-list item-layout="vertical" :data-source="basicStore.pureLists">
                             <template #renderItem="{ item }">
