@@ -13,7 +13,7 @@
 
                         <a-checkbox v-model:checked="isAllChecked" @change="selectAll"> Select All</a-checkbox>
                     </div>
-                    <div class="flex flex-1 overflow-auto">
+                    <div class="flex-1 overflow-auto w-full">
                         <a-list item-layout="vertical" :pagination="pagination" :data-source="basicStore.pureLists">
                             <template #renderItem="{ item }">
                                 <a-list-item key="item.title"
@@ -26,7 +26,7 @@
                                             <p>
                                                 <span class="text-base text-purple-800 !font-semibold">{{
                                                     item.study_title
-                                                }}</span>
+                                                    }}</span>
                                                 <span class="text-gray-600 pl-1">({{ item.nct_number }})</span>
                                             </p>
                                             <div class="grid grid-cols-3 gap-4">
@@ -34,7 +34,7 @@
                                                     <p class="flex flex-col gap-1">
                                                         <span class="text-gray-500">Start Date</span>
                                                         <span>{{ item.study_start.date ? item.study_start.date : ''
-                                                        }}</span>
+                                                            }}</span>
                                                     </p>
 
                                                     <p class="flex flex-col gap-1">

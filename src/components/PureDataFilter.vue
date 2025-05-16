@@ -312,11 +312,7 @@ watch(() => searchKwargs, (newVal: any) => {
             </div>
             <div class="filter_content flex-1 overflow-auto ">
                 <template v-if="basicStore.tableFilterData && Object.keys(basicStore.tableFilterData).length > 0">
-                    <!-- <div class="base_line border-b border-gray-300   p-4 flex flex-col gap-3">
-                        <div class="w-full flex flex-col gap-1">
-                            <a-input v-model:value="basicStore.keyword" placeholder="search" @change="handleSearch" />
-                        </div>
-                    </div> -->
+
                     <div class="study_status border-b border-gray-300   flex flex-col gap-3  p-4">
                         <p class="sea_title   text-lg">Study Status</p>
                         <a-checkbox-group class="w-full flex flex-col gap-4 overflow-hidden"

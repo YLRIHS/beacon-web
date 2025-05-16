@@ -44,11 +44,23 @@ export const useProjectService = () => {
     // SEARCH_CT_GOV
 
     const getSearchCtGov = (kwargs:any) => {
-        const { result, loading, error, refetch,onResult, onError } = useQuery<any>(PURE_QUERIES.SEARCH_CT_GOV,kwargs)
-        // console.log("kwargs",kwargs)
+        const { result, loading, error, refetch,onResult, onError } = useQuery<any>(PURE_QUERIES.SEARCH_CT_GOV,kwargs) 
         const SearchCtgov = computed(() => result.value?.SearchCtgov || [])
         return {
             SearchCtgov,
+            loading,
+            error,
+            refetch,
+            onResult,
+            onError
+        }
+    }
+    // GET_PROMPT_LIB_BY_ID
+    const getPromptLibById = (kwargs: any) => {  
+        const { result, loading, error, refetch,onResult, onError } = useQuery<any>(PURE_QUERIES.GET_PROMPT_LIB_BY_ID,kwargs.ids) 
+        const GetPromptLibById = computed(() => result.value?.GetPromptLibById || null)
+        return {
+            GetPromptLibById,
             loading,
             error,
             refetch,
@@ -61,6 +73,7 @@ export const useProjectService = () => {
         getProjectList,
         getProjectById,
         getIndicationList,
-        getSearchCtGov
+        getSearchCtGov,
+        getPromptLibById
     }
 }
