@@ -1,4 +1,4 @@
-import { useQuery ,useResult} from '@vue/apollo-composable'
+import { useQuery} from '@vue/apollo-composable'
 
 import {PURE_QUERIES} from "@/graphql/queries"
 

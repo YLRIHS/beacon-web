@@ -91,7 +91,7 @@
 
 <script setup lang="ts">
 import LoadingSpin from "@/components/common/LoadingSpin.vue";
-import { watch, ref, getCurrentInstance, onMounted, computed, reactive } from "vue";
+import { watch, ref, getCurrentInstance, onMounted } from "vue";
 import { PROJECT_MUTATIONS } from "@/graphql/mutations"
 import { PURE_QUERIES } from "@/graphql/queries";
 import { useQuery, useMutation } from "@vue/apollo-composable";
@@ -118,11 +118,20 @@ const activeLibInfo = ref<any>({});
 const isChange = ref(false);
 const promptLibList = ref<any[]>([]);
 const filterModelOption = ref<any[]>([]);
+type SearchParams = {
+    id: string;
+};
+const isChangeSearchParams = ref(false);
+const searchParams = ref<SearchParams>({
+    id: '',
+});
 
-const { result: promptListResult, loading: isLoading, refetch: PromptLibRefetch } = useQuery<any>(PURE_QUERIES.GET_PROMPT_LIB_LIST)
-const { result: LLMModelList, refetch: LLMModelListRefetch } = useQuery<any>(PURE_QUERIES.GET_LLM_MODEL_LIST)
+const { result: promptListResult, loading: isLoading, refetch: PromptLibRefetch } = useQuery<any>(PURE_QUERIES.GET_PROMPT_LIB_LIST);
+
+const { result: LLMModelList, refetch: LLMModelListRefetch } = useQuery<any>(PURE_QUERIES.GET_LLM_MODEL_LIST);
 
 const { mutate: updatePrompt } = useMutation(PROJECT_MUTATIONS.CREATE_OR_UPDATE_PROMPT_LIB);
+
 
 const cuts = (info: any) => {
     if (isChange.value) {
@@ -139,7 +148,6 @@ const handleChange = () => {
 }
 
 const save = async () => {
-
     try {
         // updatePrompt
         const res = await updatePrompt({
@@ -168,13 +176,7 @@ const cancelFun = () => {
 
 }
 
-type SearchParams = {
-    id: string;
-};
-const isChangeSearchParams = ref(false);
-const searchParams = ref<SearchParams>({
-    id: '',
-});
+
 const { GetPromptLibById, loading: activePromptLibsLoading, onError } = projectService.getPromptLibById({
     ids: searchParams,
     enable: isChangeSearchParams,

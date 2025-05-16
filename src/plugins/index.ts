@@ -1,2 +1,2 @@
 
-export { setupDirectives } from './directive';
+// export { setupDirectives } from './directive';

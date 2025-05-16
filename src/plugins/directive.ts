@@ -1,11 +1,11 @@
 
-import { App } from 'vue';
+// import { App } from 'vue';
  
 
-import roles from "./roles";
+// import roles from "./roles";
 
-export function setupDirectives(app: App) {
-    // 权限控制指令
+// export function setupDirectives(app: App) {
+//     // 权限控制指令
     
-    app.directive('roles', roles);
-} 
+//     app.directive('roles', roles);
+// } 

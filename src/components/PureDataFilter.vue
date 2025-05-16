@@ -1,12 +1,10 @@
 <script setup lang="ts">
-import { reactive, ref, getCurrentInstance, watch, onMounted } from 'vue';
+import { reactive, ref, watch, onMounted } from 'vue';
 import { useBasicStore } from '@/stores/basic';
 import { globalAPI } from "@/api";
-import { clinicalTrialsGovAPI } from '@/api';
 import dayjs, { Dayjs } from 'dayjs';
 
-const instance = getCurrentInstance();
-let { proxy }: any = instance;
+
 
 const basicStore = useBasicStore();
 
@@ -223,47 +221,7 @@ const reset_filter = () => {
 
 
 
-const getFilterStr = () => {
-    // Get human-readable filter names from filterMaps based on keys in basicStore.filters
-    const result = [];
-    const filters = basicStore.filters;
-    const filterMaps = basicStore.filterMaps;
 
-    if (filters && filterMaps) {
-        for (const key in filters) {
-            // Skip empty arrays or falsy values
-            if (!filters[key] || (Array.isArray(filters[key]) && filters[key].length === 0)) {
-                continue;
-            }
-
-            // Find the corresponding name in filterMaps
-            if (filterMaps[key]) {
-                const filterName = filterMaps[key].Name || key;
-                const filterValue = Array.isArray(filters[key]) ? filters[key].join(', ') : filters[key];
-                result.push({
-                    key: key,
-                    name: filterName,
-                    value: filterValue
-                });
-            } else {
-                // Handle special date filters or other unmapped filters
-                // Use a more readable format for keys like study_start_date_from
-                const readableName = key
-                    .replace(/_/g, ' ')
-                    .replace(/([A-Z])/g, ' $1')
-                    .toLowerCase();
-
-                result.push({
-                    key: key,
-                    name: readableName,
-                    value: filters[key]
-                });
-            }
-        }
-    }
-
-    basicStore.setFilterStr(result);
-}
 
 const getFilterMaps = () => {
     globalAPI.fetchFilterMaps().then((res: any) => {
@@ -279,9 +237,9 @@ onMounted(() => {
     getFilterMaps()
 })
 
-const handleSearch = () => {
-    basicStore.setIsApplyFilter(true);
-}
+// const handleSearch = () => {
+//     basicStore.setIsApplyFilter(true);
+// }
 
 watch(() => basicStore.filterSubmit, (newVal: any) => {
     if (newVal) {
