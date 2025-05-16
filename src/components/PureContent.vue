@@ -124,7 +124,7 @@
                         <div class="flex  justify-end">
                             <a-pagination v-model:current="current2" v-model:page-size="basicStore.pageSize"
                                 :total="basicStore.total"
-                                :show-total="(total: any, range: any) => `${range[0]}-${range[1]} of ${total} totals`"
+                                :show-total="(total: any, range: any) => `${range[0]}-${range[1]} of ${total} items`"
                                 @change="handlePaginate" />
                         </div>
 
